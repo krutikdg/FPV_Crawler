@@ -1,4 +1,16 @@
 # FPV_Crawler
+An FPV remote controlled car that can be controlled from the browser and also shows you live feed from the camera to your phone. ESP32 creates its own wifi network and serves a joystick page. A separate camera board streams the video, which means the controls keep working even if the video lags. The camera tilts according to the gyro of your phone, if not allowed, it stays fixed centre straight by default. It also features LED headlights and object detection and stop by itself to prevent accidents. The car also stops by itself if the connection drops. I built this primarily for fun and to learn how video, control, and sensors fit on a tiny board. 
+
+# Built With
+
+- ESP32 DevKit (38-pin ESP32-WROOM-32 board)
+- XIAO ESP32-S3 Sense (with camera
+- JGA25-370 12V metal gearmotor
+- TB6612FNG motor driver module
+- MPU6050 module
+- VL53L0X distance sensor module
+- Micro servo SG90
+- etc
 
 # Bill Of Materials
 
