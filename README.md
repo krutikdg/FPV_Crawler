@@ -32,3 +32,76 @@
 | Digital calipers | 1 | 3.16 | Measure every part before finalising the CAD parameters | https://www.google.com/aclk?sa=L&ai=DChsSEwj9lua34O6XAxWHhGYCHfSmAXwYACICCAEQBhoCc20&co=1&ase=2&gclid=CjwKCAiAzKvXBhBAEiwABLl9AgtDGtVyIIE_l4757AcOnEoSDVEAT_r8xe1yZ741E-gZTm3weIyOyxoCCkoQAvD_BwE&cid=CAAS9gHkaOVo9T7ESNgVbTyfCaR4bLe3ssn73l7aqnyFEgV5Yycb72jvMzQTwoG5HSSYGw0Ws7Z6Lu4M-xRIOSH6CrmyU_et6xvFt95rbOppBew7kAKPe8U7jGH4Yppi8XZrLEQ-BTaXi2sDmGKhmCzoM1_sxpqO0Pkcw9eQ5KOzE3Tu-cTuBYNieudhE_ebWkBASso0rOGsYEpq_r-JW5QwV8RfagciAXqMmuibAxvPl7pIpqdxGflEUENUI6JlUH1T7v-rzQGFqa_TFpl_e_qXaqbgz2AbWz3V1xjsB-tENENBuzoqWnh2FsJTpk09lZH9o4IJA_ripX4&cce=2&category=acrcp_v1_33&sig=AOD64_3eVlJer-Nc-9GGRu7v0np5aUpUKQ&ctype=5&q=&nis=4&ved=2ahUKEwiKp-C34O6XAxXnjOEIHel_N9cQ5bgDKAB6BAgMEBs&adurl= |
 
 <b>Estimated total: $114.05</b>
+
+# Circuit Diagram
+
+# Pin Map
+Board: ESP32 DevKit (ESP32-WROOM-32).
+
+## Signal pins
+
+| Component | Component Pin | MCU Pin |
+|---|---|---|
+| TB6612FNG | STBY | GPIO4 |
+| TB6612FNG | PWMA | GPIO25 |
+| TB6612FNG | AIN1 | GPIO26 |
+| TB6612FNG | AIN2 | GPIO27 |
+| TB6612FNG | PWMB | GPIO33 |
+| TB6612FNG | BIN1 | GPIO32 |
+| TB6612FNG | BIN2 | GPIO13 |
+| TB6612FNG | VCC | 3V3 |
+| TB6612FNG | GND | GND |
+| Battery voltage divider | Midpoint | GPIO34 |
+| MPU6050 | VCC | 3V3 |
+| MPU6050 | GND | GND |
+| MPU6050 | SDA | GPIO21 |
+| MPU6050 | SCL | GPIO22 |
+| MPU6050 | AD0 | GND |
+| VL53L0X | VCC | 3V3 |
+| VL53L0X | GND | GND |
+| VL53L0X | SDA | GPIO21 |
+| VL53L0X | SCL | GPIO22 |
+| Pan servo | Signal | GPIO18 |
+| Tilt servo | Signal | GPIO19 |
+| NPN transistor (headlights) | Base (through 1k resistor) | GPIO23 |
+| XIAO ESP32-S3 Sense | none | none |
+
+## I2C addresses
+
+| Device | Address | Note |
+|---|---|---|
+| MPU6050 | 0x68 | 0x69 if AD0 is tied high |
+| VL53L0X | 0x29 | Default address |
+
+## Power and load connections 
+
+| From | To |
+|---|---|
+| Cell 1 negative | Cell 2 positive (series junction) |
+| Pack positive (Cell 1 positive) | Power switch L1 |
+| Power switch COM | Net VBAT |
+| Pack negative (Cell 2 negative) | GND |
+| VBAT | TB6612 VM, Buck A IN+, Buck B IN+ |
+| Buck A OUT+ (set to 5.0V) | ESP32 5V (VIN) pin, XIAO 5V pin, 1000uF capacitor (C1) to GND |
+| Buck B OUT+ (set to 5.0V) | Both servo V+ pins, both headlight resistors, 1000uF capacitor (C2) to GND |
+| All module grounds | One shared GND |
+| TB6612 A01 and A02 | Left motor M1 |
+| TB6612 B01 and B02 | Right motor M2 |
+| 0.1uF ceramic (C3, C4) | Across each motor's terminals |
+| STBY | 10k resistor to GND |
+| VBAT | 100k resistor, then midpoint (to GPIO34), then 47k resistor to GND |
+| Midpoint | 0.1uF capacitor (C5) to GND |
+| Both servo GND pins | GND |
+| Buck B 5V | 100 ohm resistor, then white LED anode (two separate branches) |
+| Both LED cathodes | NPN collector |
+| NPN emitter | GND |
+| NPN base | 1k resistor to GPIO23, plus 10k resistor from base to GND |
+
+## Before you wire
+
+- Set both bucks to 5.0V with a multimeter before connecting the ESP32, XIAO or servos.
+- With the switch off, the buck inputs and TB6612 VM must read 0V.
+- Do not plug USB into the ESP32 or XIAO while a buck feeds their 5V pins.
+
+
+# CAD Models
