@@ -35,6 +35,8 @@
 
 # Circuit Diagram
 
+<img width="1258" height="696" alt="pt2" src="https://github.com/user-attachments/assets/87692c61-c700-4812-a9bf-0d4f2630bbf5" />
+
 # Pin Map
 Board: ESP32 DevKit (ESP32-WROOM-32).
 
@@ -105,3 +107,27 @@ Board: ESP32 DevKit (ESP32-WROOM-32).
 
 
 # CAD Models
+1] Made the dummies <br>
+<img width="1512" height="982" alt="Screenshot 2026-11-03 at 8 20 17 PM" src="https://github.com/user-attachments/assets/57a50330-8a00-44ef-aba2-77896e0c15f8" /> <br>
+2] Made the tub base with battery holder provision <br>
+<img width="1512" height="982" alt="Screenshot 2026-11-03 at 9 42 24 PM" src="https://github.com/user-attachments/assets/8dcf6fe1-de5a-4077-b69a-516bf771b001" /> <br>
+3] Added lower clamps <br>
+<img width="1206" height="739" alt="Screenshot 2026-11-04 at 6 58 14 AM" src="https://github.com/user-attachments/assets/22739006-50b4-4359-9924-8ba2b3a07623" /> <br>
+4] Added upper clamps <br>
+<img width="1512" height="982" alt="Screenshot 2026-11-04 at 7 37 53 AM" src="https://github.com/user-attachments/assets/e57c985b-1bef-443b-824f-1582b234d9ac" />
+<img width="1512" height="982" alt="Screenshot 2026-11-04 at 7 37 56 AM" src="https://github.com/user-attachments/assets/ed35da55-530f-4268-bed4-15c43fb80b0f" /> <br>
+5] Added Deck with slots for components <br>
+<img width="1512" height="982" alt="Screenshot 2026-11-04 at 8 01 16 AM" src="https://github.com/user-attachments/assets/5a61b23b-3d79-46fd-bf60-8e8afca14fb5" /> <br>
+6] Made Camera Cradle <br>
+<img width="1512" height="982" alt="Screenshot 2026-11-04 at 10 39 46 AM" src="https://github.com/user-attachments/assets/02390ddc-ec1d-440d-be24-2d3b0570bcc1" /> <br>
+7] Complete with all the dummies in place <br>
+<img width="1512" height="982" alt="Screenshot 2026-11-04 at 4 05 58 PM" src="https://github.com/user-attachments/assets/cb3de45d-981b-47c4-a9b1-67463f9273e2" />
+
+
+
+
+
+
+
+
+
