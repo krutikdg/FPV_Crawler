@@ -117,6 +117,188 @@ Board: ESP32 DevKit (ESP32-WROOM-32).
 - With the switch off, the buck inputs and TB6612 VM must read 0V.
 - Do not plug USB into the ESP32 or XIAO while a buck feeds their 5V pins.
 
+## Assembly guide
+
+Read all of it once before you start. The order matters, because most of the expensive mistakes happen when a step is done early.
+
+### What you need on the bench
+
+Everything in the Bill of Materials, plus a multimeter, you need it to set the buck converters and to check the battery reading. A small Phillips screwdriver, side cutters, and wire strippers help as well.
+
+### Before you touch anything
+
+1. Measure every part with calipers (motor body, shaft length, wheel hub, boards) and compare the numbers with the Fusion parameters. The printed parts only fit if those numbers are right.
+2. Print one clamp station (a block and a cap) in PLA and try it on a real motor before printing the frame in PETG.
+3. Flash both boards on the bench, before they go in the car. See Step 1.
+
+### Step 1: flash the boards on the bench
+
+1. Open `crawler_controller.ino` and `crawler_camera.ino`. Change the WiFi password in the settings block at the top of both files so the two match. WPA2 needs at least 8 characters.
+2. Install the libraries: WebSockets by Markus Sattler, and Adafruit VL53L0X (the Adafruit BusIO library comes along with it).
+3. Flash the ESP32 DevKit with the board set to an ESP32 Dev Module.
+4. Flash the XIAO ESP32-S3 Sense with the board set to the XIAO ESP32S3 and PSRAM enabled. Check the exact PSRAM setting name in your Arduino core version, since it changes.
+5. Power each board from USB only, one at a time. Open the Serial Monitor at 115200 and confirm that the ESP32 starts its network and the XIAO joins it and prints its address (192.168.4.50).
+
+Do not connect USB while the board is also powered from the buck converter. Flash on the bench, then install.
+
+### Step 2: print the parts
+
+| Part | Quantity | Orientation |
+|---|---|---|
+| Frame | 1 | Floor on the bed |
+| Deck | 1 | Flat |
+| Clamp cap | 8 | Upside down, screw side on the bed |
+| Camera cradle | 1 | Open top up |
+
+### Step 3: prepare the motors
+
+1. Solder about 15 cm of silicone wire to each motor's two terminals.
+2. Pair the motors by side. The two left motors go in parallel on one TB6612 channel (A01 and A02), and the two right motors go on the other (B01 and B02). Parallel means the red lead of each motor joins the same wire, and the black leads join the other.
+3. Solder one 0.1 uF ceramic capacitor across each channel's two output wires, close to the motors.
+4. Test each pair for a second with 5 V or the bench supply before they go in the frame. If a pair turns the wrong way, you can swap its wires now.
+
+### Step 4: fit the motors into the clamps
+
+1. Slide each motor into its two grooves with the shaft going through the hole in the side wall.
+2. Place a cap over each clamp and start both M3x16 screws by hand.
+3. Tighten the two screws a little at a time, alternating, until the motor does not turn when you push the shaft. Stop there. Printed plastic cracks if you keep going.
+4. Check that the cap has not touched the block. There should still be a visible gap of about 0.4 mm.
+
+### Step 5: fit the wheels
+
+1. Line up the flat of the shaft with the flat in the wheel hub and push the wheel on until the hub is fully seated.
+2. Spin each wheel by hand. If it scrapes the frame, there is not enough gap. Pull it back a millimeter only if the hub still grips the shaft by more than half its length.
+
+### Step 6: battery bay and power switch
+
+1. Press the two-slot 18650 holder into the battery bay. The bay is a loose fit, so a small piece of foam tape keeps it still.
+2. Fit the latching switch into the hole in the deck near the rear.
+3. Put the cells in the holder with the right polarity. Check it twice against the markings. Do not close the switch yet.
+
+### Step 7: set the buck converters before anything else touches them
+
+1. Wire the battery holder to the switch and the switch to the two buck converters only. Leave everything else disconnected.
+2. Switch on and adjust each buck output to 5.0 V with the multimeter.
+3. Switch off and write "A" and "B" on the two modules so you do not swap them later.
+
+This is the most important electrical step. A buck converter that comes out of the box set to 12 V will destroy an ESP32.
+
+### Step 8: mount the boards on the deck
+
+1. Press the ESP32 and the TB6612 into their pockets and hold them with a small zip tie through the slots.
+2. Stick the two buck converters and the IMU into their pockets with double-sided foam tape.
+3. Check that the IMU lies flat, with its chip facing up. The heading hold in the code assumes that.
+
+### Step 9: wire it up
+
+Use the Pin Mapping section for the full table. The order below keeps each stage easy to test.
+
+1. Power. VBAT to TB6612 VM and to both buck inputs. Buck A output to the ESP32 5V (VIN) pin and the XIAO 5V pin. Buck B output to both servo power wires and the two headlight resistors. Every ground goes to the shared ground.
+2. Logic power. ESP32 3V3 to TB6612 VCC.
+3. Motor driver. GPIO4 to STBY (with the 10k resistor from STBY to ground), GPIO25 to PWMA, GPIO26 to AIN1, GPIO27 to AIN2, GPIO33 to PWMB, GPIO32 to BIN1, GPIO13 to BIN2.
+4. Battery reading. VBAT through 100k to a node, from the node through 47k to ground. The node goes to GPIO34 with a 0.1 uF capacitor to ground.
+5. Sensors. GPIO21 to the SDA pin of both the IMU and the distance sensor, GPIO22 to SCL on both. Connect the IMU's AD0 pin to ground. The IMU answers at 0x68 and the distance sensor at 0x29.
+6. Servos. GPIO18 to the pan signal and GPIO19 to the tilt signal.
+7. Headlights. Each LED has a 100 ohm resistor from Buck B to its anode. Both cathodes go to the 2N2222 collector. The emitter goes to ground. GPIO23 goes through a 1k resistor to the base, and a 10k resistor runs from the base to ground.
+
+Route the motor wires away from the I2C wires where you can. Motors add noise to a bus.
+
+### Step 10: front wall and camera head
+
+1. Press the distance sensor board into its holder behind the window in the front wall, chip facing the opening.
+2. Press the two LEDs into their holes.
+3. Fit the pan and tilt bracket. Center both servos before you press the horns on: power them once so they move to the middle position, then attach the horns so the camera looks straight ahead.
+4. Seat the XIAO in the camera cradle with the lens in the window, and hold it with a zip tie. Fix the cradle to the bracket with double-sided tape or small screws.
+5. Leave a loop of slack in the camera's power wires so the pan motion does not pull on them.
+
+The holes for the bracket in the deck should be cut to match the bracket you actually received. Measure the bracket before you print the final deck.
+
+### Step 11: first power-up
+
+1. Lift the car so the wheels are in the air. Close the switch.
+2. Join the phone to the WiFi network called Crawler and open 192.168.4.1 in the browser.
+3. Check in this order: the page loads, the battery voltage shows roughly the right number, the distance reading changes when you put a hand in front of the sensor, the camera video appears, and the headlights switch on.
+4. Push the joystick forward. Both sides should turn forward. If one side spins backward, switch off and swap the two wires of that pair.
+5. Let the connection drop (walk away, or switch the phone's WiFi off). The wheels should stop within a fraction of a second. If they do not, do not drive the car until you find out why.
+6. Close the deck on the posts with four M3x10 screws.
+
+### Step 12: first drive
+
+Drive slowly on a clear floor first. Try turning in place, then a straight line, then drive toward a wall and let the auto brake slow the car down. Tune the settings block in the code (speeds, brake distances) to taste.
+
+## Calibration
+
+Battery reading. Measure the pack voltage with the multimeter and compare it with the number on the page. If they differ by more than a few hundredths of a volt, adjust the calibration value in the settings block.
+
+Gyro direction. The heading hold assumes the IMU is flat with its Z axis up. If the car veers more when assist is on than when it is off, change the gyro direction setting from -1 to 1.
+
+Camera orientation. If the picture is upside down or mirrored, change the flip and mirror settings at the top of `crawler_camera.ino`.
+
+## Troubleshooting
+
+### The Crawler network does not appear
+The ESP32 is probably not powered. Check the 5 V at the ESP32's pin with the multimeter. Then check the Serial Monitor for the network start message. If you changed the password, make sure it is at least 8 characters.
+
+### The phone joins the network but the page will not load
+Android sometimes drops a network that has no internet and falls back to mobile data. Turn mobile data off, or accept the prompt that asks to stay connected. Make sure the address is typed as http://192.168.4.1, since the browser may try https.
+
+### The page loads but there is no video
+The XIAO is the usual cause. Check that it is powered, that it prints its address in the Serial Monitor, and that it joined the network (power the ESP32 first, since the XIAO needs the network to exist). Try the stream address directly in the phone browser: http://192.168.4.50:81/stream. If the camera fails to start, confirm PSRAM is enabled and check the camera pin numbers in the sketch against Seeed's current pinout, because I wrote them from memory.
+
+### The video is slow or stutters
+The stream is small on purpose (QVGA). Try moving closer to the car, turning the JPEG quality number up a little (a higher number means lower quality in this library), and keeping other phones off the network.
+
+### Tilting the phone does nothing
+This is expected on many Android phones when the page is served over plain HTTP. The page waits about 2 seconds and falls back to a centered camera, and the screen should say tilt is off. It is a limit of the browser, not a fault in the car.
+
+### The motors do not move
+Work down this list. The battery voltage must be above 6.0 V (the code stops driving below that). STBY must be high after setup (GPIO4). The TB6612 needs power on VM and on VCC (3.3 V). The failsafe stops the motors if commands stop arriving for 300 ms, so a phone that went to sleep also looks like dead motors.
+
+### The motors are weak, or the ESP32 restarts when driving
+This usually means the battery voltage dips under load. Check the cells are charged and the battery holder contacts are firm. Keep the motor and battery wires short and thick. If a restart persists, a larger capacitor across the battery supply near the motor driver is a likely fix, but I have not tested that on this build.
+
+### The motor driver gets hot
+Each TB6612 channel is rated for about 1.2 A continuously, and two motors on one channel can ask for more than that if they stall. Do not push the car against a wall at full throttle. If the chip gets too hot to touch, switch off and let it cool.
+
+### The car spins instead of driving straight
+One side is reversed. Swap the two wires of the pair on that side.
+
+### The car veers to one side
+The motors differ a little, which is normal. Turn the heading hold on. If the veer gets worse with it on, flip the gyro direction setting. Also check that the wheels are seated fully on their shafts.
+
+### A wheel rubs the frame
+Check the gap between the wall and the wheel. A thin washer between the hub and the wall can fix a small error. If the shaft is too short for the hub to seat, the gap in the CAD needs to shrink, and the frame has to be reprinted.
+
+### A motor slips in its clamp
+Tighten the two cap screws a little more, alternating between them. If the motor still turns, the groove is too big for your motor, and you need to reduce the clamp gap or the groove diameter in the CAD.
+
+### A cap or block cracked
+You tightened too far. Print a new cap, and stop tightening as soon as the motor will not turn.
+
+### The distance sensor never brakes, or brakes too early
+Check the Serial Monitor for the sensor's address (0x29). If it is missing, look at the SDA and SCL wires. If it reads but the numbers look odd, check that the chip lines up with the window and that the board is not tilted. A sensor looking through a deep opening can see the edge of the hole.
+
+### An I2C device is not found
+The IMU must answer at 0x68 with AD0 on ground, and the distance sensor at 0x29. Swapped SDA and SCL wires, a missing ground, or a missing 3.3 V are the common causes. Run an I2C scanner sketch to see what answers.
+
+### The servos jitter
+Servos pull power in short bursts. Make sure they run from Buck B and not from the ESP32 pins, share a ground with the ESP32, and that the 1000 uF capacitor sits across Buck B's output. If the camera head still twitches at rest, check for a loose signal wire.
+
+### The headlights do not light
+Check the LED polarity. Then check the transistor pin order against its datasheet, since 2N2222 variants can be wired differently. A base resistor that is open, or a missing connection from GPIO23, also keeps them off.
+
+### The battery reading is wrong
+Check the two resistor values (100k and 47k) and the connection to GPIO34. Then follow the battery calibration step above.
+
+### I cannot upload to the ESP32
+Unplug the battery pack first, since USB and the buck converter should not power the board at the same time. If the upload still times out, hold the BOOT button while the upload starts. Avoid wiring anything to GPIO0, 2, 12 or 15, which affect how the chip boots.
+
+### Something smells hot or the supply browns out
+Switch off at once and remove the cells. Look for a short between a power wire and ground, a reversed wire on a module, or a buck converter that was not set to 5.0 V.
+
+### Safety
+Use protected 18650 cells and charge them outside the car. Take them out if the car will sit unused for a long time.
+
 
 # CAD Models
 1] Made the dummies <br>
